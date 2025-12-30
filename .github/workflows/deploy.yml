@@ -6,27 +6,32 @@ on:
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest # Runs on GitHub's servers
+    runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ github.sha }}
+      image_name: ${{ steps.lower.outputs.image_name }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Lowercase Registry Name
+        id: lower
+        run: |
+          echo "image_name=ghcr.io/${{ github.repository_owner }}/docker-stopper" | tr '[:upper:]' '[:lower:]' >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build and Push
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:latest .
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker build -t ${{ steps.lower.outputs.image_name }}:latest .
+          docker push ${{ steps.lower.outputs.image_name }}:latest
 
   deploy:
     needs: build-and-push
-    runs-on: self-hosted # Runs on YOUR home server
+    runs-on: self-hosted
     steps:
       - name: Pull new image and restart
         run: |
-          # Go to the folder where your docker-compose.yml lives
-          cd ~/path/to/your/project 
-          docker compose pull
+          cd ~/path/to/your/project
+          # Use the lowercase name here too
+          docker pull ${{ needs.build-and-push.outputs.image_name }}:latest
           docker compose up -d
