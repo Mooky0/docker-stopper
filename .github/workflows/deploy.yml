@@ -1,0 +1,32 @@
+name: Deploy Torrent Manager
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest # Runs on GitHub's servers
+    outputs:
+      image_tag: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build and Push
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:latest .
+          docker push ghcr.io/${{ github.repository }}:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: self-hosted # Runs on YOUR home server
+    steps:
+      - name: Pull new image and restart
+        run: |
+          # Go to the folder where your docker-compose.yml lives
+          cd ~/path/to/your/project 
+          docker compose pull
+          docker compose up -d
