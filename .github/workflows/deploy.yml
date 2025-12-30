@@ -33,13 +33,18 @@ jobs:
     needs: build-and-push
     runs-on: self-hosted
     steps:
+      # 1. This brings your docker-compose.yml from GitHub to the server
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Login so we can pull the private image
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+      # 3. Pull and Deploy from the current workspace
       - name: Pull and Deploy
         run: |
-          cd ~/media/docker-stopper
-          docker pull ${{ needs.build-and-push.outputs.image_name }}:latest
+          # No need to 'cd' if your compose file is in the root of your repo
+          docker compose pull
           docker compose up -d
-          # Optional: Clean up old images to save space
           docker image prune -f
