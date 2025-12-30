@@ -37,6 +37,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # THIS STEP CREATES THE .ENV FILE
+      - name: Create .env file
+        run: |
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" > .env
+          echo "PAUSE_DURATION=${{ secrets.PAUSE_DURATION }}" >> .env
+
       # 2. Login so we can pull the private image
       - name: Login to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
