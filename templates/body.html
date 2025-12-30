@@ -1,0 +1,31 @@
+<h1>Network Management</h1>
+
+{% if msg %}
+<div class="alert alert-primary alert-dismissible fade show d-inline-block mx-auto" role="alert">
+    {{ msg }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: relative; margin-left: 20px;"></button>
+</div>
+{% endif %}
+
+{% if running %}
+<p>The torrent jelenleg fut.</p>
+<button 
+    style="padding: 20px; font-size: 20px; background-color: red; color: white;"
+    hx-post="/disable"
+    hx-target="#content-area"
+    hx-swap="innerHTML"
+    hx-trigger="click"
+>
+    Torrent szüneteltetése (30 Mins)
+</button>
+{% else %}
+<p>The torrent is currently stopped. It will restart automatically.</p>
+<button 
+    style="padding: 20px; font-size: 20px; background-color: green; color: white;"
+    hx-post="/start"
+    hx-target="#content-area"
+    hx-swap="innerHTML"
+    hx-trigger="click">
+    Torrent indítása most
+</button>
+{% endif %}
