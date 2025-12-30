@@ -35,7 +35,7 @@ jobs:
     steps:
       - name: Pull new image and restart
         run: |
-          cd ~/path/to/your/project
+          cd ~/media/docker-stopper
           # Use the lowercase name here too
           docker pull ${{ needs.build-and-push.outputs.image_name }}:latest
           docker compose up -d
