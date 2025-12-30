@@ -1,6 +1,6 @@
 services:
   torrent-manager:
-    image: ghcr.io/Mooky0/docker-stopper:latest
+    image: ghcr.io/mooky0/docker-stopper:latest
     ports:
       - "8080:8080"
     env_file:
